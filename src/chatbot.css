@@ -1,0 +1,22 @@
+/* Force chatbot to have fixed dimensions */
+df-messenger {
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  z-index: 9999 !important;
+  width: 400px !important;
+  max-height: 600px !important;
+  height: auto !important;
+}
+
+/* Prevent the chatbot from expanding beyond viewport */
+df-messenger::part(chat-wrapper) {
+  max-height: 500px !important;
+}
+
+/* If the above doesn't work, try injecting into shadow DOM */
+@supports (height: 100dvh) {
+  df-messenger {
+    max-height: calc(100dvh - 100px) !important;
+  }
+}

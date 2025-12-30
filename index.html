@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HealthLink</title>
+
+    <!-- Dialogflow Chatbot Script -->
+    <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <!-- Dialogflow Chatbot -->
+    <df-messenger
+      intent="WELCOME"
+      chat-title="HealthLink Assistant"
+      agent-id="ea7ea259-2a9e-4a05-b005-17d35c63984f"
+      language-code="en"
+    ></df-messenger>
+
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
