@@ -73,7 +73,7 @@ const HealthLinkDMS: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const handleJoinUs = () => navigate("/signup");
+  const handleJoinUs = () => navigate("/appointment");
   const ourServices = () => navigate("/services");
 
   return (
@@ -286,7 +286,7 @@ const HealthLinkDMS: React.FC = () => {
               onClick={() => handleJoinUs()}
               className="bg-white text-blue-600 px-8 py-3 rounded-md text-lg font-semibold hover:bg-gray-100 transition duration-200"
             >
-              Join Us Today!
+              Book Appointment Today!
             </button>
             <button
               onClick={() => ourServices()}

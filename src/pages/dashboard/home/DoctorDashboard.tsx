@@ -15,21 +15,73 @@ const DoctorDashboard: React.FC = () => {
     loadDashboardData();
   }, []);
 
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        loadDashboardData();
+      }
+    };
+
+    const handleFocus = () => {
+      loadDashboardData();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
+
   const loadDashboardData = async () => {
     setLoading(true);
     setError(null);
     
     try {
-      const [statsData, appointmentsData] = await Promise.all([
+      // Get all appointments with different statuses to ensure we get everything
+      const [statsData, confirmedAppointments, pendingAppointmentsData, completedAppointmentsData] = await Promise.all([
         doctorService.getDoctorStats(),
-        doctorService.getMyAppointments(1, 10, 'confirmed')
+        doctorService.getMyAppointments(1, 100, 'confirmed'),
+        doctorService.getMyAppointments(1, 100, 'pending'),
+        doctorService.getMyAppointments(1, 100, 'completed')
       ]);
       
-      setStats(statsData);
+      // Combine all appointments from different status calls
+      const allAppointments = [
+        ...(confirmedAppointments.data.appointments || []),
+        ...(pendingAppointmentsData.data.appointments || []),
+        ...(completedAppointmentsData.data.appointments || [])
+      ];
       
-      // Filter today's appointments
+      // Remove duplicates by ID
+      const uniqueAppointments = allAppointments.filter((apt, index, self) => 
+        index === self.findIndex((a) => a._id === apt._id)
+      );
+      
+      // Filter appointments based on medical history
+      const pendingAppointments = uniqueAppointments.filter(apt => 
+        !apt.patient?.medicalHistory || apt.patient.medicalHistory.length === 0
+      );
+      
+      const completedAppointments = uniqueAppointments.filter(apt => 
+        apt.patient?.medicalHistory && apt.patient.medicalHistory.length > 0
+      );
+      
+      // Update stats with locally calculated counts (as backup)
+      const updatedStats = {
+        ...statsData,
+        pendingAppointments: statsData.pendingAppointments || pendingAppointments.length,
+        completedAppointments: statsData.completedAppointments || completedAppointments.length,
+        totalAppointments: statsData.totalAppointments || uniqueAppointments.length
+      };
+      
+      setStats(updatedStats);
+      
+      // Filter today's appointments from all appointments
       const today = new Date().toISOString().split('T')[0];
-      const todaysAppts = appointmentsData.data.appointments?.filter(apt => 
+      const todaysAppts = uniqueAppointments.filter(apt => 
         apt.appointmentDate.split('T')[0] === today
       ) || [];
       setTodayAppointments(todaysAppts);
@@ -158,15 +210,11 @@ const DoctorDashboard: React.FC = () => {
                   <div className="text-right">
                     <p className="text-sm font-medium text-gray-900">{appointment.timeSlot}</p>
                     <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      appointment.status === 'confirmed' 
-                        ? 'bg-green-100 text-green-800'
-                        : appointment.status === 'pending'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : appointment.status === 'completed'
+                      appointment.patient?.medicalHistory?.length > 0
                         ? 'bg-blue-100 text-blue-800'
-                        : 'bg-red-100 text-red-800'
+                        : 'bg-yellow-100 text-yellow-800'
                     }`}>
-                      {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                      {appointment.patient?.medicalHistory?.length > 0 ? 'Completed' : 'Pending'}
                     </span>
                   </div>
                 </div>
@@ -176,59 +224,7 @@ const DoctorDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-          <div className="space-y-3">
-            <button className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
-              View All Appointments
-            </button>
-            <button className="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">
-              Manage Availability
-            </button>
-            <button className="w-full bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700">
-              View My Patients
-            </button>
-          </div>
-        </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">This Week</h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Completed</span>
-              <span className="text-sm font-medium text-green-600">{stats?.completedAppointments || 0}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Pending</span>
-              <span className="text-sm font-medium text-orange-600">{stats?.pendingAppointments || 0}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Total Patients</span>
-              <span className="text-sm font-medium text-blue-600">{stats?.totalPatients || 0}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-          <div className="space-y-3">
-            <div className="text-sm">
-              <p className="text-gray-900 font-medium">New appointment booked</p>
-              <p className="text-gray-500">1 hour ago</p>
-            </div>
-            <div className="text-sm">
-              <p className="text-gray-900 font-medium">Patient record updated</p>
-              <p className="text-gray-500">3 hours ago</p>
-            </div>
-            <div className="text-sm">
-              <p className="text-gray-900 font-medium">Availability updated</p>
-              <p className="text-gray-500">1 day ago</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

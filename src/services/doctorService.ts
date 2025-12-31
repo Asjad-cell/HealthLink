@@ -11,6 +11,18 @@ import {
 } from "../types/api";
 
 class DoctorService {
+  async getAvailability(): Promise<Availability[]> {
+    const response = await apiService.get<ApiResponse<Availability[]>>(
+      "/doctor/availability"
+    );
+
+    if (response.success && response.data) {
+      return response.data;
+    }
+
+    throw new Error(response.message || "Failed to fetch availability");
+  }
+
   async updateAvailability(
     availability: Availability[]
   ): Promise<Availability[]> {
@@ -59,6 +71,22 @@ class DoctorService {
     }
 
     throw new Error(response.message || "Failed to update appointment");
+  }
+
+  async updateAppointmentStatusByPatient(
+    patientId: string,
+    updateData: UpdateAppointmentRequest
+  ): Promise<Appointment[]> {
+    const response = await apiService.patch<ApiResponse<Appointment[]>>(
+      `/doctor/appointments/patient/${patientId}`,
+      updateData
+    );
+
+    if (response.success && response.data) {
+      return response.data;
+    }
+
+    throw new Error(response.message || "Failed to update appointment(s)");
   }
 
   async getMyPatients(

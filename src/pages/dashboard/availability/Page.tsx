@@ -55,6 +55,9 @@ const AvailabilityPage: React.FC = () => {
   const { execute: updateAvailability, loading: updating } = useApi(
     doctorService.updateAvailability
   );
+  const { execute: getAvailability } = useApi(
+    doctorService.getAvailability
+  );
 
   useEffect(() => {
     loadCurrentAvailability();
@@ -64,16 +67,41 @@ const AvailabilityPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      // Initialize with default availability if none exists
+      // Try to fetch existing availability from backend
+      const savedAvailability = await getAvailability();
+      
+      if (savedAvailability && savedAvailability.length > 0) {
+        // Ensure all days are present and in correct order
+        const completeAvailability = DAYS_OF_WEEK.map((day) => {
+          const existing = savedAvailability.find((avail) => avail.day === day);
+          return existing || {
+            day,
+            startTime: "09:00",
+            endTime: "17:00",
+            isAvailable: false,
+          };
+        });
+        setAvailability(completeAvailability);
+      } else {
+        // Initialize with default availability if none exists
+        const defaultAvailability: Availability[] = DAYS_OF_WEEK.map((day) => ({
+          day,
+          startTime: "09:00",
+          endTime: "17:00",
+          isAvailable: false,
+        }));
+        setAvailability(defaultAvailability);
+      }
+    } catch (error) {
+      // If fetching fails, use default availability
       const defaultAvailability: Availability[] = DAYS_OF_WEEK.map((day) => ({
         day,
         startTime: "09:00",
         endTime: "17:00",
         isAvailable: false,
       }));
-
       setAvailability(defaultAvailability);
-    } catch (error) {
+      
       setError(
         error instanceof Error ? error.message : "Failed to load availability"
       );

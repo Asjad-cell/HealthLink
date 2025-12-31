@@ -94,7 +94,18 @@ const DoctorPatientsPage: React.FC = () => {
       } else {
         // Add new record
         await addRecord(selectedPatient._id, recordData);
-        toast.success('Medical record added successfully!', { id: 'record-added' });
+        
+        // Update appointment status to completed for this patient's pending appointments
+        try {
+          await doctorService.updateAppointmentStatusByPatient(selectedPatient._id, {
+            status: 'completed'
+          });
+          toast.success('Medical record added and appointment marked as completed!', { id: 'record-added' });
+        } catch (appointmentError) {
+          // Still show success for medical record, but warn about appointment update
+          console.warn('Medical record added but failed to update appointment status:', appointmentError);
+          toast.success('Medical record added successfully!', { id: 'record-added' });
+        }
       }
 
       setIsAddRecordOpen(false);

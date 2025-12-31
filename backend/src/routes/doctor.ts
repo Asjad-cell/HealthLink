@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import {
+  getAvailability,
   updateAvailability,
   getMyAppointments,
   updateAppointmentStatus,
+  updateAppointmentStatusByPatient,
   getMyPatients,
   addPatientRecord,
   getDoctorStats,
@@ -17,9 +19,11 @@ const router = Router();
 router.use(authenticate);
 router.use(authorize('doctor'));
 
+router.get('/availability', getAvailability);
 router.put('/availability', updateAvailability);
 router.get('/appointments', getMyAppointments);
 router.patch('/appointments/:appointmentId', updateAppointmentStatus);
+router.patch('/appointments/patient/:patientId', updateAppointmentStatusByPatient);
 router.get('/patients', getMyPatients);
 router.post('/patients/:patientId/records', validatePatientUpdate, addPatientRecord);
 router.put('/patients/:patientId/records/:recordIndex', updatePatientRecord);

@@ -3,6 +3,34 @@ import { Doctor, Patient, Appointment } from "../models";
 import { AuthRequest, PopulatedPatient } from "../types";
 import { Types } from 'mongoose';
 
+export const getAvailability = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const doctor = await Doctor.findOne({ user: req.user?.id });
+    if (!doctor) {
+      res.status(404).json({
+        success: false,
+        message: "Doctor profile not found",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Availability fetched successfully",
+      data: doctor.availability || [],
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server error fetching availability",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
+
 export const updateAvailability = async (
   req: AuthRequest,
   res: Response
@@ -136,6 +164,60 @@ export const updateAppointmentStatus = async (
     res.status(500).json({
       success: false,
       message: "Server error updating appointment",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
+
+export const updateAppointmentStatusByPatient = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const { patientId } = req.params;
+    const { status } = req.body;
+
+    const doctor = await Doctor.findOne({ user: req.user?.id });
+    if (!doctor) {
+      res.status(404).json({
+        success: false,
+        message: "Doctor profile not found",
+      });
+      return;
+    }
+
+    // Find all appointments for this patient and doctor
+    const appointments = await Appointment.find({
+      patient: patientId,
+      doctor: doctor._id,
+    });
+
+    if (appointments.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: "No appointments found for this patient",
+      });
+      return;
+    }
+
+    // Update all appointments status
+    const updatedAppointments = await Promise.all(
+      appointments.map(async (appointment) => {
+        appointment.status = status;
+        await appointment.save();
+        return appointment;
+      })
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Updated ${updatedAppointments.length} appointment(s) status successfully`,
+      data: updatedAppointments,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server error updating appointments by patient",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -424,17 +506,21 @@ export const getDoctorStats = async (
       return;
     }
 
-    const totalAppointments = await Appointment.countDocuments({
+    // Get all appointments for this doctor with patient details
+    const allAppointments = await Appointment.find({
       doctor: doctor._id,
-    });
-    const pendingAppointments = await Appointment.countDocuments({
-      doctor: doctor._id,
-      status: "pending",
-    });
-    const completedAppointments = await Appointment.countDocuments({
-      doctor: doctor._id,
-      status: "completed",
-    });
+    }).populate("patient", "medicalHistory");
+
+    // Filter appointments based on medical history
+    const pendingAppointments = allAppointments.filter(apt => 
+      !apt.patient || !(apt.patient as any).medicalHistory || (apt.patient as any).medicalHistory.length === 0
+    ).length;
+
+    const completedAppointments = allAppointments.filter(apt => 
+      apt.patient && (apt.patient as any).medicalHistory && (apt.patient as any).medicalHistory.length > 0
+    ).length;
+
+    const totalAppointments = allAppointments.length;
     const totalPatients = await Appointment.distinct("patient", {
       doctor: doctor._id,
     });
