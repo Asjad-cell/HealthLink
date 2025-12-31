@@ -15,7 +15,7 @@ const PORT = Number(process.env.PORT) || 5000;
 
 // Connect to MongoDB and create default admin
 connectDB()
-  .then(() => createDefaultAdmin())
+  // .then(() => createDefaultAdmin())
   .catch(err => {
     console.error('❌ DB Connection Failed:', err);
     process.exit(1);
