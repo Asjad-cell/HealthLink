@@ -1,4 +1,4 @@
-export const API_BASE_URL = import.meta.env.VITE_API_URL;
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://healthlink-production.up.railway.app';
 
 class ApiService {
   private baseURL: string;
