@@ -7,7 +7,7 @@ class AuthService {
 
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     const response = await apiService.post<ApiResponse<LoginResponse>>(
-      "/auth/login",
+      "/api/v1/auth/login",
       credentials
     );
 
@@ -33,7 +33,7 @@ class AuthService {
   }
 
   async getProfile(): Promise<User> {
-    const response = await apiService.get<ApiResponse<User>>("/auth/profile");
+    const response = await apiService.get<ApiResponse<User>>("/api/v1/auth/profile");
 
     if (response.success && response.data) {
       this.setUser(response.data);
