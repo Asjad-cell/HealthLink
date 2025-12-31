@@ -19,9 +19,20 @@ const AdminDashboard: React.FC = () => {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
+  /* ---------------- Load Dashboard Data ---------------- */
   useEffect(() => {
     loadDashboardData();
+  }, []);
+
+  /* ---------------- Live Clock ---------------- */
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const loadDashboardData = async () => {
@@ -59,12 +70,33 @@ const AdminDashboard: React.FC = () => {
     );
   }
 
-  /* ---------------- Pending Appointments Count (UI-based) ---------------- */
+  /* ---------------- Pending Appointments ---------------- */
   const pendingAppointmentsCount = recentAppointments.filter(
     (appointment) =>
       !appointment.patient?.medicalHistory ||
       appointment.patient.medicalHistory.length === 0
   ).length;
+
+  /* ---------------- Today Insights ---------------- */
+  const todayAppointments = recentAppointments.filter((a) => {
+    const today = new Date();
+    const appDate = new Date(a.appointmentDate);
+    return today.toDateString() === appDate.toDateString();
+  });
+
+  const completedToday = todayAppointments.filter(
+    (a) => a.patient?.medicalHistory?.length > 0
+  ).length;
+
+  const pendingToday = todayAppointments.length - completedToday;
+
+  const hour = currentTime.getHours();
+  const greeting =
+    hour < 12
+      ? "Good Morning ☀️"
+      : hour < 18
+      ? "Good Afternoon 🌤️"
+      : "Good Evening 🌙";
 
   const statCards = [
     {
@@ -93,7 +125,10 @@ const AdminDashboard: React.FC = () => {
       value: pendingAppointmentsCount,
       icon: Clock,
       color: "bg-orange-500",
-      change: pendingAppointmentsCount > 0 ? `+${pendingAppointmentsCount}` : "0",
+      change:
+        pendingAppointmentsCount > 0
+          ? `+${pendingAppointmentsCount}`
+          : "0",
     },
   ];
 
@@ -212,7 +247,42 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Bottom Sections unchanged */}
+      {/* 🔥 Live System Overview (Full Width Bottom Section) */}
+      <div className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg p-6 text-white">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+          <div>
+            <p className="text-sm opacity-80">Current Time</p>
+            <p className="text-2xl font-bold">
+              {currentTime.toLocaleTimeString()}
+            </p>
+            <p className="text-sm">
+              {currentTime.toLocaleDateString(undefined, {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-sm opacity-80">System Status</p>
+            <p className="text-xl font-semibold">{greeting}</p>
+            <p className="text-sm opacity-90">
+              All services operational 🚀
+            </p>
+          </div>
+
+          <div>
+            <p className="text-sm opacity-80">Quick Insight</p>
+            <p className="text-sm leading-relaxed">
+              {pendingToday > 0
+                ? "Some patients are still waiting. Consider follow-ups."
+                : "Everything is on track today. Great work!"}
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
