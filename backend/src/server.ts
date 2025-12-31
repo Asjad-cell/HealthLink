@@ -13,11 +13,17 @@ dotenv.config();
 const app = express();
 const PORT = Number(process.env.PORT) || 5000;
 
-// Connect to MongoDB and create default admin
+// Connect to MongoDB
 connectDB()
-  // .then(() => createDefaultAdmin())
+  .then(() => {
+    console.log('✅ MongoDB connected');
+    // Seed admin asynchronously so server start isn't blocked
+    createDefaultAdmin()
+      .then(() => console.log('✅ Default admin created'))
+      .catch(err => console.error('❌ Seed admin error:', err));
+  })
   .catch(err => {
-    console.error('❌ DB Connection Failed:', err);
+    console.error('❌ DB connection failed:', err);
     process.exit(1);
   });
 
@@ -27,9 +33,9 @@ app.use(cors({
   origin: process.env.NODE_ENV === 'production'
     ? [
         process.env.CLIENT_URL || '',
-        'https://health-link-seven.vercel.app' // Replace with your Vercel frontend URL
+        'https://health-link-seven.vercel.app', // Replace with your Vercel frontend URL
       ].filter(Boolean)
-    : ['http://localhost:5173'], // Your local Vite dev server
+    : ['http://localhost:5173'], // Local Vite dev server
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
@@ -65,7 +71,7 @@ process.on('unhandledRejection', (err: Error) => {
   server.close(() => process.exit(1));
 });
 
-// Graceful shutdown for SIGTERM (Railway)
+// Graceful shutdown for SIGTERM (Render/Railway)
 process.on('SIGTERM', () => {
   console.log('👋 SIGTERM received, shutting down gracefully...');
   server.close(() => {
