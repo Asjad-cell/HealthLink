@@ -10,7 +10,7 @@ import {
 class AppointmentService {
   async bookAppointment(appointmentData: BookAppointmentRequest): Promise<Appointment> {
     const response = await apiService.post<ApiResponse<Appointment>>(
-      '/appointments/book',
+      '/api/v1/appointments/book',
       appointmentData
     );
     
@@ -22,7 +22,7 @@ class AppointmentService {
   }
 
   async getAvailableDoctors(specialization?: string): Promise<DoctorProfile[]> {
-    let url = '/appointments/doctors';
+    let url = '/api/v1/appointments/doctors';
     if (specialization) {
       url += `?specialization=${encodeURIComponent(specialization)}`;
     }
@@ -48,7 +48,7 @@ class AppointmentService {
       throw new Error('Invalid doctor ID provided');
     }
     
-    let url = `/appointments/doctors/${doctorId}/availability`;
+    let url = `/api/v1/appointments/doctors/${doctorId}/availability`;
     if (date) {
       url += `?date=${date}`;
     }

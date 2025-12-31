@@ -13,7 +13,7 @@ import {
 class DoctorService {
   async getAvailability(): Promise<Availability[]> {
     const response = await apiService.get<ApiResponse<Availability[]>>(
-      "/doctor/availability"
+      "/api/v1/doctor/availability"
     );
 
     if (response.success && response.data) {
@@ -27,7 +27,7 @@ class DoctorService {
     availability: Availability[]
   ): Promise<Availability[]> {
     const response = await apiService.put<ApiResponse<Availability[]>>(
-      "/doctor/availability",
+      "/api/v1/doctor/availability",
       { availability }
     );
 
@@ -43,7 +43,7 @@ class DoctorService {
     limit: number = 10,
     status?: string
   ): Promise<PaginationResponse<Appointment>> {
-    let url = `/doctor/appointments?page=${page}&limit=${limit}`;
+    let url = `/api/v1/doctor/appointments?page=${page}&limit=${limit}`;
     if (status) {
       url += `&status=${status}`;
     }
@@ -62,7 +62,7 @@ class DoctorService {
     updateData: UpdateAppointmentRequest
   ): Promise<Appointment> {
     const response = await apiService.patch<ApiResponse<Appointment>>(
-      `/doctor/appointments/${appointmentId}`,
+      `/api/v1/doctor/appointments/${appointmentId}`,
       updateData
     );
 
@@ -78,7 +78,7 @@ class DoctorService {
     updateData: UpdateAppointmentRequest
   ): Promise<Appointment[]> {
     const response = await apiService.patch<ApiResponse<Appointment[]>>(
-      `/doctor/appointments/patient/${patientId}`,
+      `/api/v1/doctor/appointments/patient/${patientId}`,
       updateData
     );
 
@@ -94,7 +94,7 @@ class DoctorService {
     limit: number = 10
   ): Promise<PaginationResponse<Patient>> {
     const response = await apiService.get<PaginationResponse<Patient>>(
-      `/doctor/patients?page=${page}&limit=${limit}`
+      `/api/v1/doctor/patients?page=${page}&limit=${limit}`
     );
 
     if (response.success) {
@@ -109,7 +109,7 @@ class DoctorService {
     recordData: AddMedicalRecordRequest
   ): Promise<Patient> {
     const response = await apiService.post<ApiResponse<Patient>>(
-      `/doctor/patients/${patientId}/records`,
+      `/api/v1/doctor/patients/${patientId}/records`,
       recordData
     );
 
@@ -126,7 +126,7 @@ class DoctorService {
     recordData: AddMedicalRecordRequest
   ): Promise<Patient> {
     const response = await apiService.put<ApiResponse<Patient>>(
-      `/doctor/patients/${patientId}/records/${recordIndex}`,
+      `/api/v1/doctor/patients/${patientId}/records/${recordIndex}`,
       recordData
     );
 
@@ -142,7 +142,7 @@ class DoctorService {
     data: { billingAmount: number }
   ): Promise<Patient> {
     const response = await apiService.put<ApiResponse<Patient>>(
-      `/doctor/patients/${patientId}/billing`,
+      `/api/v1/doctor/patients/${patientId}/billing`,
       data
     );
 
@@ -155,7 +155,7 @@ class DoctorService {
 
   async getDoctorStats(): Promise<DoctorStats> {
     const response = await apiService.get<ApiResponse<DoctorStats>>(
-      "/doctor/stats"
+      "/api/v1/doctor/stats"
     );
 
     if (response.success && response.data) {

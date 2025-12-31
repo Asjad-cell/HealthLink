@@ -16,7 +16,7 @@ class AdminService {
   ): Promise<{ user: User; doctor: DoctorProfile; token: string }> {
     const response = await apiService.post<
       ApiResponse<{ user: User; doctor: DoctorProfile; token: string }>
-    >("/admin/doctors", doctorData);
+    >("/api/v1/admin/doctors", doctorData);
 
     if (response.success && response.data) {
       return response.data;
@@ -30,7 +30,7 @@ class AdminService {
     limit: number = 10
   ): Promise<PaginationResponse<DoctorProfile>> {
     const response = await apiService.get<PaginationResponse<DoctorProfile>>(
-      `/admin/doctors?page=${page}&limit=${limit}`
+      `/api/v1/admin/doctors?page=${page}&limit=${limit}`
     );
 
     if (response.success) {
@@ -45,7 +45,7 @@ class AdminService {
     limit: number = 10
   ): Promise<PaginationResponse<Patient>> {
     const response = await apiService.get<PaginationResponse<Patient>>(
-      `/admin/patients?page=${page}&limit=${limit}`
+      `/api/v1/admin/patients?page=${page}&limit=${limit}`
     );
 
     if (response.success) {
@@ -61,7 +61,7 @@ class AdminService {
     patientData: Partial<Patient>
   ): Promise<Patient> {
     const response = await apiService.patch<ApiResponse<Patient>>(
-      `/admin/patients/${patientId}`,
+      `/api/v1/admin/patients/${patientId}`,
       patientData
     );
 
@@ -74,7 +74,7 @@ class AdminService {
 
   async toggleDoctorStatus(doctorId: string): Promise<DoctorProfile> {
     const response = await apiService.patch<ApiResponse<DoctorProfile>>(
-      `/admin/doctors/${doctorId}/toggle-status`
+      `/api/v1/admin/doctors/${doctorId}/toggle-status`
     );
 
     if (response.success && response.data) {
@@ -89,7 +89,7 @@ class AdminService {
     doctorData: Omit<CreateDoctorRequest, 'password'> & { password?: string }
   ): Promise<DoctorProfile> {
     const response = await apiService.patch<ApiResponse<DoctorProfile>>(
-      `/admin/doctors/${doctorId}`,
+      `/api/v1/admin/doctors/${doctorId}`,
       doctorData
     );
 
@@ -116,7 +116,7 @@ class AdminService {
   async getAllAppointments(): Promise<{ appointments: Appointment[] }> {
     const response = await apiService.get<
       ApiResponse<{ appointments: Appointment[] }>
-    >("/admin/appointments");
+    >("/api/v1/admin/appointments");
 
     if (response.success && response.data) {
       return response.data;
@@ -135,7 +135,7 @@ class AdminService {
     
     const response = await apiService.get<
       ApiResponse<{ appointments: Appointment[] }>
-    >(`/appointments/doctor/${doctorId}`);
+    >(`/api/v1/appointments/doctor/${doctorId}`);
 
     if (response.success && response.data) {
       return response.data;
@@ -152,7 +152,7 @@ class AdminService {
   }> {
     const response = await apiService.get<
       ApiResponse<{ stats: AdminStats; recentAppointments: Appointment[] }>
-    >("/admin/dashboard/stats");
+    >("/api/v1/admin/dashboard/stats");
 
     if (response.success && response.data) {
       return response.data;
