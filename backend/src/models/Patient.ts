@@ -45,7 +45,7 @@ const PatientSchema: Schema = new Schema({
   phone: {
     type: String,
     required: [true, 'Phone number is required'],
-    match: [/^[+]?[1-9][\d]{0,15}$/, 'Please enter a valid phone number']
+    match: [/^\+?[\d\s\-\(\)]{7,20}$/, 'Please enter a valid phone number']
   },
   age: {
     type: Number,
