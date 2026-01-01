@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/useAuth";
 import { LoadingSpinner } from "../components/common/LoadingSpinner";
-import { ErrorMessage } from "../components/common/ErrorMessage";
+import { toast } from "sonner";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -10,7 +10,6 @@ const Login = () => {
     password: "",
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -20,19 +19,17 @@ const Login = () => {
       ...prev,
       [name]: value,
     }));
-    setError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
 
     try {
       await login(formData.email, formData.password);
       navigate("/dashboard");
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Login failed');
+      toast.error(error instanceof Error ? error.message : 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -45,10 +42,6 @@ const Login = () => {
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Login</h1>
           <p className="text-gray-600">Access your HealthLink dashboard.</p>
         </div>
-
-        {error && (
-          <ErrorMessage message={error} className="mb-6" />
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Email */}

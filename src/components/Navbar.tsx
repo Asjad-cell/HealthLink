@@ -86,12 +86,14 @@ const Navbar = () => {
           >
             Services
           </Link>
-          <Link
-            to="/appointment"
-            className="text-gray-700 hover:text-blue-600 font-medium"
-          >
-            Book Appointment
-          </Link>
+          <div className="mt-6 mb-6">
+            <Link
+              to="/appointment"
+              className="text-gray-700 hover:text-blue-600 font-medium"
+            >
+              Book Appointment
+            </Link>
+          </div>
           <hr />
           <Link
             to="/login"
@@ -100,7 +102,6 @@ const Navbar = () => {
           >
             Login
           </Link>
-
         </div>
       )}
     </header>
