@@ -38,7 +38,7 @@ app.use(cors({
     : ['http://localhost:5173'], // Local Vite dev server
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
 }));
 app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));

@@ -12,10 +12,38 @@ const Footer = () => {
             </h3>
           </div>
           <div className="flex space-x-4">
-            <Facebook className="w-5 h-5 hover:text-blue-200 cursor-pointer" />
-            <Twitter className="w-5 h-5 hover:text-blue-200 cursor-pointer" />
-            <Linkedin className="w-5 h-5 hover:text-blue-200 cursor-pointer" />
-            <Youtube className="w-5 h-5 hover:text-blue-200 cursor-pointer" />
+            <a 
+              href="https://www.facebook.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-blue-200 transition-colors"
+            >
+              <Facebook className="w-5 h-5" />
+            </a>
+            <a 
+              href="https://www.twitter.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-blue-200 transition-colors"
+            >
+              <Twitter className="w-5 h-5" />
+            </a>
+            <a 
+              href="https://www.linkedin.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-blue-200 transition-colors"
+            >
+              <Linkedin className="w-5 h-5" />
+            </a>
+            <a 
+              href="https://www.youtube.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-blue-200 transition-colors"
+            >
+              <Youtube className="w-5 h-5" />
+            </a>
           </div>
         </div>
       </div>

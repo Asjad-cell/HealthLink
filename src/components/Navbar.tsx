@@ -48,7 +48,7 @@ const Navbar = () => {
               to="/login"
               className="px-4 py-2 text-gray-700 hover:text-blue-600 font-medium"
             >
-              <LogIn/>
+              <LogIn />
             </Link>
           </div>
 
@@ -86,6 +86,12 @@ const Navbar = () => {
           >
             Services
           </Link>
+          <Link
+            to="/appointment"
+            className="text-gray-700 hover:text-blue-600 font-medium"
+          >
+            Book Appointment
+          </Link>
           <hr />
           <Link
             to="/login"
@@ -94,13 +100,7 @@ const Navbar = () => {
           >
             Login
           </Link>
-          <Link
-            to="/signup"
-            className="block px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium w-fit"
-            onClick={() => setIsOpen(false)}
-          >
-            Sign Up
-          </Link>
+
         </div>
       )}
     </header>

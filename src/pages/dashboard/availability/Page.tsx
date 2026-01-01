@@ -363,11 +363,7 @@ const AvailabilityPage: React.FC = () => {
                 setSaveError(null);
                 setSaved(false);
                 setAvailability((prev) =>
-                  prev.map((item) => ({
-                    ...item,
-                    startTime: "09:00",
-                    endTime: "17:00",
-                  }))
+                  prev.map((item) => ({ ...item, isAvailable: true }))
                 );
               }}
               className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
