@@ -103,11 +103,11 @@ class AdminService {
   // Delete doctor
   async deleteDoctor(doctorId: string): Promise<{ message: string }> {
     const response = await apiService.delete<ApiResponse<{ message: string }>>(
-      `/admin/doctors/${doctorId}`
+      `/api/v1/admin/doctors/${doctorId}`
     );
 
-    if (response.success && response.data) {
-      return response.data;
+    if (response.success) {
+      return response.data || { message: response.message || "Doctor deleted successfully" };
     }
 
     throw new Error(response.message || "Failed to delete doctor");

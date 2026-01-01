@@ -35,7 +35,7 @@ const AdminDoctorsPage: React.FC = () => {
     name: "",
     specialization: "General Medicine",
     phone: "",
-    experience: 0,
+    experience: "",
     qualification: "",
   });
 
@@ -69,7 +69,7 @@ const AdminDoctorsPage: React.FC = () => {
       name: "",
       specialization: "General Medicine",
       phone: "",
-      experience: 0,
+      experience: "",
       qualification: "",
     });
     setFormErrors({});
@@ -85,7 +85,7 @@ const AdminDoctorsPage: React.FC = () => {
       name: doctor.name || "",
       specialization: doctor.specialization || "General Medicine",
       phone: doctor.phone || "",
-      experience: doctor.experience ?? 0,
+      experience: doctor.experience?.toString() ?? "",
       qualification: doctor.qualification || "",
     });
     setFormErrors({});
@@ -123,7 +123,8 @@ const AdminDoctorsPage: React.FC = () => {
     if (!phone) {
       errors.phone = "Phone is required";
     } else if (!/^(0[0-9]{10}|\+92[0-9]{10})$/.test(phone)) {
-      errors.phone = "Phone number must be in Pakistani format (e.g., 03001234567 or +923001234567)";
+      errors.phone =
+        "Phone number must be in this format (e.g., 03001234567 or +923001234567)";
     }
 
     if (!qualification) errors.qualification = "Qualification is required";
@@ -151,12 +152,14 @@ const AdminDoctorsPage: React.FC = () => {
 
     try {
       if (editingDoctor) {
-        const updatePayload: Omit<CreateDoctorRequest, 'password'> & { password?: string } = {
+        const updatePayload: Omit<CreateDoctorRequest, "password"> & {
+          password?: string;
+        } = {
           email: formData.email.trim(),
           name: formData.name.trim(),
           specialization: formData.specialization,
           phone: formData.phone.trim(),
-          experience: formData.experience,
+          experience: Number(formData.experience),
           qualification: formData.qualification.trim(),
         };
 
@@ -173,7 +176,7 @@ const AdminDoctorsPage: React.FC = () => {
           name: formData.name.trim(),
           specialization: formData.specialization,
           phone: formData.phone.trim(),
-          experience: formData.experience,
+          experience: Number(formData.experience),
           qualification: formData.qualification.trim(),
         };
 
@@ -191,15 +194,28 @@ const AdminDoctorsPage: React.FC = () => {
   };
 
   const handleDeactivateDoctor = async (id: string) => {
-    if (!confirm("Are you sure you want to deactivate this doctor?")) return;
-
-    try {
-      await adminService.deleteDoctor(id);
-      toast.success("Doctor deactivated successfully");
-      await loadDoctors();
-    } catch {
-      toast.error("Failed to deactivate doctor");
-    }
+    // Show a toast with action buttons for confirmation
+    toast("Are you sure you want to delete this doctor?", {
+      action: {
+        label: "Delete",
+        onClick: async () => {
+          try {
+            await adminService.deleteDoctor(id);
+            toast.success("Doctor deleted successfully");
+            await loadDoctors();
+          } catch {
+            toast.error("Failed to delete doctor");
+          }
+        },
+      },
+      cancel: {
+        label: "Cancel",
+        onClick: () => {
+          toast.info("Deletion cancelled");
+        },
+      },
+      duration: 10000, // Keep toast visible for 10 seconds
+    });
   };
 
   /* =========================
@@ -389,7 +405,10 @@ const AdminDoctorsPage: React.FC = () => {
                   type="text"
                   value={formData.qualification}
                   onChange={(e) =>
-                    setFormData((p) => ({ ...p, qualification: e.target.value }))
+                    setFormData((p) => ({
+                      ...p,
+                      qualification: e.target.value,
+                    }))
                   }
                   className="w-full border px-3 py-2 rounded-lg"
                 />
@@ -438,7 +457,7 @@ const AdminDoctorsPage: React.FC = () => {
                   onChange={(e) =>
                     setFormData((prev) => ({
                       ...prev,
-                      experience: Number(e.target.value) || 0,
+                      experience: e.target.value,
                     }))
                   }
                   className="w-full border px-3 py-2 rounded-lg"
@@ -474,10 +493,7 @@ const AdminDoctorsPage: React.FC = () => {
             </div>
 
             <div className="flex justify-end gap-3 mt-6">
-              <button
-                onClick={closeModal}
-                className="px-4 py-2 border rounded"
-              >
+              <button onClick={closeModal} className="px-4 py-2 border rounded">
                 Cancel
               </button>
               <button

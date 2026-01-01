@@ -42,7 +42,7 @@ export const validateDoctorCreation = [
     .withMessage('Please select a valid specialization'),
   body('phone')
     .matches(/^(0[0-9]{10}|\+92[0-9]{10})$/)
-    .withMessage('Phone number must be in Pakistani format (e.g., 03001234567 or +923001234567)'),
+    .withMessage('Phone number must be in this format (e.g., 03001234567 or +923001234567)'),
   body('experience')
     .isInt({ min: 0, max: 50 })
     .withMessage('Experience must be between 0 and 50 years'),
