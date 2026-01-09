@@ -60,13 +60,13 @@ const DoctorDashboard: React.FC = () => {
         index === self.findIndex((a) => a._id === apt._id)
       );
       
-      // Filter appointments based on medical history
+      // Filter appointments based on their actual status
       const pendingAppointments = uniqueAppointments.filter(apt => 
-        !apt.patient?.medicalHistory || apt.patient.medicalHistory.length === 0
+        apt.status === 'pending'
       );
       
       const completedAppointments = uniqueAppointments.filter(apt => 
-        apt.patient?.medicalHistory && apt.patient.medicalHistory.length > 0
+        apt.status === 'completed'
       );
       
       // Update stats with locally calculated counts (as backup)
